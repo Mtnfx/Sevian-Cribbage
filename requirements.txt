@@ -1,0 +1,4 @@
+# Sevian Cribbage Engine dependencies
+# Additional libraries will be added as required during development
+
+numpy
