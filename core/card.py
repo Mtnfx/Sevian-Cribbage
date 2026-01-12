@@ -1,0 +1,59 @@
+from __future__ import annotations
+import numpy as np
+
+class Card:
+    rank: int #Exact rank of card i.e. J, Q, K
+    value: int #Number of points card is worth when counting, i.e. J, Q, K = 10
+    suit: int
+    
+    def __init__(self, rank: int, suit: int):
+        self.rank = rank
+        self.value = np.min([self.rank + 1, 10]) #10, J, Q, K cards are all worth 10 points in counting.
+        self.suit = suit
+        
+    def __repr__(self):
+        #When print call is made, print card as a tuple of its suit and rank.
+        return(f"({self.suit}, {self.rank})")
+        
+    def __add__(self, other: Card | int) -> int:
+        """
+        Add cards valuewise or adds the value of card to an existing integer total.
+
+        Args:
+            other (Card|int): Card or integer value total whose value will be added to the rank of self.
+
+        Returns:
+            int: Sum of values of self and other.
+        """
+        if (type(other) == int):
+            return(self.value + other)
+        
+        elif (type(other) == Card):
+            return(self.value + other.value)
+        
+        else:
+            return NotImplemented
+        
+    def __sub__(self, other: Card) -> int:
+        """
+        Subtract cards rankwise.
+
+        Args:
+            other (Card): Card whose rank will be subtracted from rank of self
+
+        Returns:
+            int: Difference in rank between self and other.
+        """
+        return(self.rank - other.rank)
+    
+    def __and__(self, other: Card) -> bool:
+        """
+        Check if cards have the same suit.
+
+        Args:
+            other (Card): Card whose suit will be compared to self.
+
+        Returns:
+            bool: True if cards have the same suit. False otherwise.
+        """
+        return(self.suit == other.suit)
