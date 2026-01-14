@@ -41,18 +41,27 @@ class Hand:
         return count
     
     def fifteen_points(self, indices: list[int] = [], points: int = 0) -> int:
-    
-        for i in range(np.max(indices) + 1, len(self.cards)):
-            indices.append(i)
-            card_set = Stack([self.cards[j] for j in indices])
+        
+        if not indices:
+            low = 0
+            
+        else:
+            low = np.max(indices) + 1
+        
+        for i in range(low, len(self.cards)):
+            print(f"i = {i}")
+            card_set = Stack([self.cards[j] for j in indices] + [self.cards[i]])
+            print(card_set.cards)
             
             #If current cards add to exactly fifteen, they score 2 fifteen points.
             if(+card_set == 15):
-                return points + 2
+                points += 2
             
             #If current set of cards adds to less than 15, adding another card may form a fifteen.
             elif(+card_set < 15):
+                indices.append(i)
                 points = self.fifteen_points(indices, points)
+                indices.pop()
         
         return points
     

@@ -37,3 +37,14 @@ def test_suit_count(test_hand: Hand):
    
 def test_pairs(p_hand: Hand, points: int):
     assert p_hand.pair_points() == points
+     
+#Testing fifteen counting
+@pytest.mark.parametrize("f_hand, points", [
+    (Hand(Deck(2, 5).cards[0:5]), 0), #Five cards from this deck can add to at most 10 (only ranks are A and 2). Zero fifteen points expected.
+    (Hand([Card(0,4), Card(5,3), Card(10,3), Card(8,1), Card(10,1)]), 2), #Hand of A, 6, J, 9, J has one possible 15; scores 2 points.
+    (Hand([Card(5,4), Card(4,3), Card(12,3), Card(2,1), Card(10,1)]), 4), #Hand with 6, 5, K, 3, J has two possible 15 combinations; scores 4 points.
+    (Hand([Card(8,4), Card(3,3), Card(8,3), Card(1,1), Card(5,1)]), 8), #Hand with 9, 4, 9, 2, 6 has four possible 15 combinations; scores 8 points.
+])
+
+def test_fifteen_points(f_hand: Hand, points: int):
+    assert f_hand.fifteen_points() == points
