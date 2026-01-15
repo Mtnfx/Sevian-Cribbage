@@ -39,6 +39,25 @@ class Stack():
             return 0
         
         return(-index)
+    
+    def pairs(self) -> int:
+        """
+        Calculate pair points on top of stack.
+
+        Returns:
+            int: Number of points scored by pairs.
+        """
+        points = 0
+        #Loop through all but top card in stack until we hit a card without the same rank as the top card.
+        for i in range(2, len(self.cards)+1):
+            #If the current card we're looking at is the same rank as the top, it forms a pair for each card above it in the stack (i-1)
+            if self.cards[-i].rank == self.cards[-1].rank:
+                points += 2*(i-1)
+            #If the current card is a different rank, we've reached the end of the pairs.
+            else:
+                return points
+        #If we make it to this point, all cards on the stack are the same rank.
+        return points
         
     def add_card(self, card: Card) -> bool:
         """

@@ -24,8 +24,19 @@ def test_stack_sum(sum_stack: Stack, value: int):
 def test_stack_flush(flush_stack: Stack, points: int):
     assert ~flush_stack == points
     
-#Test add_card
+#Test pair counting in stack.
+@pytest.mark.parametrize("pair_stack, points", [
+    (Stack([Card(1,2), Card(3,2), Card(4,2), Card(5,2)]), 0), #All different ranks (but all same suit); expect 0 pair points.
+    (Stack([Card(1,0), Card(3,1), Card(5,3), Card(5,2)]), 2), #Pair at top of stack; expect 2 pair points.
+    (Stack([Card(1,2), Card(4,3), Card(4,2), Card(6,2)]), 0), #Pair in middle of stack; expect 0 points as pairs in stacks only when they appear at the top of the stack.
+    (Stack([Card(1,2), Card(8,3), Card(8,1), Card(8,2)]), 6), #Triple at top of stack; expect 6 pair points.
+    (Stack([Card(5,4), Card(5,0), Card(5,1), Card(5,2)]), 12), #All four cards in stack are the same rank; expect 12 pair points.
+])
 
+def test_stack_pair(pair_stack: Stack, points: int):
+    assert pair_stack.pairs() == points
+
+#Test add_card
 params = [
     (Stack([Card(4,1), Card(1,4), Card(3,1), Card(3,4)]), Card(3,2), True, Card(3,2)), #Initial stack sums to 15; attempting to add a 4 should return True.
     (Stack([Card(4,1), Card(7,4), Card(3,1), Card(3,4)]), Card(9,2), True, Card(9,2)), #Initial stack sums to 21; attempting to add a 10 leaves the stack at EXACTLY 31; should return True.
