@@ -60,3 +60,18 @@ class Card:
             bool: True if cards have the same suit. False otherwise.
         """
         return(self.suit == other.suit)
+    
+    def __eq__(self, other: object) -> bool:
+        """
+        Check if two cards are identical; primarily used in testing.
+
+        Args:
+            other (object): Card to check for equality with
+
+        Returns:
+            bool: True if cards have same suit and same rank, False otherwise.
+        """
+        if not isinstance(other, Card):
+            return NotImplemented
+        
+        return (self.rank == other.rank) and (self & other)
