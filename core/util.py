@@ -1,4 +1,4 @@
-#from .card import Card
+from .card import Card
 #from .hand import Hand
 
 def specific_run_points(ranks: list[int], run: list[int]) -> int:
@@ -20,3 +20,22 @@ def specific_run_points(ranks: list[int], run: list[int]) -> int:
     
     #Total points scored is the length of the run we checked times the number of runs we were able to form.
     return n*len(run)
+
+def is_run(cards: list[Card]) -> bool:
+    """
+    Check if cards score single run.
+
+    Args:
+        cards (list[Card]): cards to check for run
+        
+    Returns:
+        bool: True if ALL cards form single run, otherwise False.
+    """
+    ranks = [card.rank for card in cards]
+    i = min(ranks)
+    
+    for _ in range(len(cards)-1):
+        if i+1 not in ranks:
+            return False
+        i += 1 
+    return True
