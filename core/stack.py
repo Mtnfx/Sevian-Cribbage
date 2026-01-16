@@ -28,17 +28,20 @@ class Stack():
         Returns:
             int: Maximum number n such that the top n cards in the stack are the same suit if n >= 4. Else 0.
         """
-        #Since we use append to add cards to the stack, the top of the stack is the end of the self.cards list.
-        index = -1
-        #Keep moving one card backward in stack until we find pair of cards that do not the same suit or reach the end of the stack.
-        while(index > -len(self.cards) and (self.cards[index] & self.cards[index-1])):
-            index -= 1
-        
-        #If the number of same-suit cards at the top of stack is < 4, no flush is counted. 
-        if(index > -4):
+        #If stack has less than 4 cards, a flush is impossible.
+        if len(self.cards) < 4:
             return 0
         
-        return(-index)
+        #Move through all cards to find the index of the first card with a DIFFERENT suit to the top card.
+        for i in range(len(self.cards)):
+            if not(self.cards[i] & self.cards[0]):
+                #If at least top 4 cards have the same suit, flush points are awarded
+                if i >= 4:
+                    return i
+                return 0
+        
+        #If this return is reached, every card in the stack has the same suit.
+        return i + 1
     
     def pairs(self) -> int:
         """
@@ -49,10 +52,10 @@ class Stack():
         """
         points = 0
         #Loop through all but top card in stack until we hit a card without the same rank as the top card.
-        for i in range(2, len(self.cards)+1):
+        for i in range(len(self.cards)):
             #If the current card we're looking at is the same rank as the top, it forms a pair for each card above it in the stack (i-1)
-            if self.cards[-i].rank == self.cards[-1].rank:
-                points += 2*(i-1)
+            if self.cards[i] - self.cards[0] == 0:
+                points += 2*i
             #If the current card is a different rank, we've reached the end of the pairs.
             else:
                 return points
@@ -61,7 +64,7 @@ class Stack():
         
     def add_card(self, card: Card) -> bool:
         """
-        Adds card to stack if allowed by Sevian Cribbage rules.
+        Adds card to stack (as index 0) if allowed by Sevian Cribbage rules.
 
         Args:
             card (Card): Card to be added to stack.
@@ -74,5 +77,5 @@ class Stack():
             return False
         
         #If we didn't return False, card can be added to stack.
-        self.cards.append(card)
+        self.cards.insert(0, card)
         return True
