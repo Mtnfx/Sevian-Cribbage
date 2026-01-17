@@ -10,6 +10,9 @@ class Hand:
     def __init__(self, cards: list[Card]):
         self.cards = cards
         
+    def __len__(self) -> int:
+        return len(self.cards)
+        
     def __iadd__(self, card: Card) -> Hand:
         """
         Succinct command to add card to existing hand.
@@ -49,10 +52,9 @@ class Hand:
         else:
             low = np.max(indices) + 1
         
-        for i in range(low, len(self.cards)):
+        for i in range(low, len(self)):
             print(f"i = {i}")
             card_set = Stack([self.cards[j] for j in indices] + [self.cards[i]])
-            print(card_set.cards)
             
             #If current cards add to exactly fifteen, they score 2 fifteen points.
             if(+card_set == 15):
@@ -75,8 +77,8 @@ class Hand:
         """
         points = 0
         
-        for i in range(len(self.cards)-1):
-            for j in range(i+1,len(self.cards)):
+        for i in range(len(self)-1):
+            for j in range(i+1,len(self)):
                 if(self.cards[i] - self.cards[j] == 0):
                     points += 2
             
@@ -187,6 +189,6 @@ class Hand:
         #If our cut card has a valid suit, the default argument was overridden.
         if cut.suit >= 0:
             eyes += self.eyes_points(cut) #Calculate eye points
-            full_hand.cards.append(cut) #Add valid cut card to hand we need to score.
+            full_hand += cut #Add valid cut card to hand we need to score.
 
         return eyes + full_hand.fifteen_points() + full_hand.flush_points() + full_hand.pair_points() + full_hand.ring_points() + full_hand.run_points()
