@@ -171,3 +171,22 @@ class Hand:
                 return 1
         
         return 0
+    
+    def points(self, cut: Card = Card(12,-1)) -> int:
+        """
+        Calculate number of points hand will earned when scored with or without cut card.
+
+        Args:
+            cut (Card, optional): Cut card for current round. Defaults to Card(12,-1) (Void Eye; not in deck).
+            
+        Returns:
+            int: Number of points scored by hand (and cut card if added as an argument).
+        """
+        eyes = 0
+        full_hand = self
+        #If our cut card has a valid suit, the default argument was overridden.
+        if cut.suit >= 0:
+            eyes += self.eyes_points(cut) #Calculate eye points
+            full_hand.cards.append(cut) #Add valid cut card to hand we need to score.
+
+        return eyes + full_hand.fifteen_points() + full_hand.flush_points() + full_hand.pair_points() + full_hand.ring_points() + full_hand.run_points()

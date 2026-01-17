@@ -27,7 +27,7 @@ def test_suit_count(test_hand: Hand):
 
 #Testing pair counting
 
-@pytest.mark.parametrize("p_hand, points", [
+@pytest.mark.parametrize("pair_hand, points", [
     (Hand(Deck(13, 1).cards[0:5]), 0), #Hand with no pairs scores 0 points from pairs
     (Hand([Card(1,4), Card(3,3), Card(1,3), Card(2,1), Card(10,1)]), 2), #Hand with one pair scores 2 points
     (Hand([Card(1,4), Card(2,3), Card(1,3), Card(2,1), Card(10,1)]), 4), #Hand with two pairs scores 4 points
@@ -35,19 +35,19 @@ def test_suit_count(test_hand: Hand):
     (Hand([Card(1,4), Card(1,3), Card(1,0), Card(1,1), Card(1,4)]), 20), #Hand with five-of-a-kind scores 20 points
 ])
    
-def test_pairs(p_hand: Hand, points: int):
-    assert p_hand.pair_points() == points
+def test_pairs(pair_hand: Hand, points: int):
+    assert pair_hand.pair_points() == points
      
 #Testing fifteen counting
-@pytest.mark.parametrize("f_hand, points", [
+@pytest.mark.parametrize("fifteen_hand, points", [
     (Hand(Deck(2, 5).cards[0:5]), 0), #Five cards from this deck can add to at most 10 (only ranks are A and 2). Zero fifteen points expected.
     (Hand([Card(0,4), Card(5,3), Card(10,3), Card(8,1), Card(10,1)]), 2), #Hand of A, 6, J, 9, J has one possible 15; scores 2 points.
     (Hand([Card(5,4), Card(4,3), Card(12,3), Card(2,1), Card(10,1)]), 4), #Hand with 6, 5, K, 3, J has two possible 15 combinations; scores 4 points.
     (Hand([Card(8,4), Card(3,3), Card(8,3), Card(1,1), Card(5,1)]), 8), #Hand with 9, 4, 9, 2, 6 has four possible 15 combinations; scores 8 points.
 ])
 
-def test_fifteen_points(f_hand: Hand, points: int):
-    assert f_hand.fifteen_points() == points
+def test_fifteen_points(fifteen_hand: Hand, points: int):
+    assert fifteen_hand.fifteen_points() == points
     
 #Testing flush_points
 @pytest.mark.parametrize("flush_hand, points", [
@@ -72,7 +72,7 @@ def test_eyes_points(eyes_hand: Hand, cut: Card, points: int):
 
 #Testing ring_points
 @pytest.mark.parametrize("ring_hand, points", [
-    (Hand(Deck(1, 5).cards), 3), #This deck has only one rank; each card has a different suit, so guaranteed to form ring.
+    (Hand(Deck(1,5).cards), 3), #This deck has only one rank; each card has a different suit, so guaranteed to form ring.
     (Hand([Card(0,4), Card(5,2), Card(10,3), Card(8,0), Card(10,1)]), 3), #This hand has multiple Jacks, but all different suits. It forms a ring.
     (Hand([Card(5,3), Card(4,1), Card(12,3), Card(2,1), Card(10,2)]), 0), #Hand with two pairs of same-suited cards. Does NOT form a ring.
 ])
@@ -82,7 +82,7 @@ def test_ring_points(ring_hand: Hand, points: int):
     
 #Testing run points
 @pytest.mark.parametrize("r_hand, points", [
-    (Hand(Deck(2, 5).cards[0:5]), 0), #This deck has two ranks and thus cannot score runs.
+    (Hand(Deck(2,5).cards[0:5]), 0), #This deck has two ranks and thus cannot score runs.
     (Hand([Card(1,4), Card(3,3), Card(1,3), Card(2,1), Card(9,3)]), 6), #Two 2,3,4 runs present; scores 6 points from runs.
     (Hand([Card(1,4), Card(10,3), Card(8,3), Card(3,1), Card(2,1), Card(9,1)]), 6), #2,3,4 and 9,10,J runs present; scores 6 points from runs.
     (Hand([Card(2,4), Card(3,3), Card(1,3), Card(4,1), Card(0,1)]), 5), #A,2,3,4,5 run present; scores 5 points from runs.
@@ -91,3 +91,38 @@ def test_ring_points(ring_hand: Hand, points: int):
 
 def test_run_points(r_hand: Hand, points: int):
     assert r_hand.run_points() == points
+
+#Test total points with no cut card.  
+@pytest.mark.parametrize("point_hand, points", [
+    (Hand([Card(0,4), Card(5,3), Card(10,3), Card(8,1), Card(10,1)]), 4), #One pair and one fifteen; expect 4 points.
+    (Hand([Card(5,4), Card(6,1), Card(7,3), Card(7,1), Card(6,3)]), 24), #12 run points, 4 pair points, 8 fifteen points; expect 24.
+    (Hand([Card(4,4), Card(4,3), Card(4,0), Card(4,1), Card(4,2)]), 43), #Forms a ring, 20 pair points, 20 fifteen points; expect 43.
+    (Hand([Card(0,4), Card(6,3), Card(1,3), Card(12,1), Card(9,1)]), 0), #Junk hand, no tricks; expect 0.
+])
+
+def test_points_no_cut(point_hand: Hand, points: int):
+    assert point_hand.points() == points
+    
+#Test total points with cut card.  
+@pytest.mark.parametrize("point_hand, cut, points", [
+    (Hand([Card(0,1), Card(5,1), Card(12,3), Card(12,1)]), Card(4,1), 11), #4 flush points, eyes, 2 pair points, 4 fifteen points; expect 11.
+    (Hand([Card(5,4), Card(6,1), Card(7,3), Card(7,1)]), Card(6,3), 24), #12 run points, 4 pair points, 8 fifteen points; expect 24.
+    (Hand([Card(4,4), Card(4,3), Card(4,0), Card(4,1)]), Card(4,2), 43), #Forms a ring, 20 pair points, 20 fifteen points; expect 43.
+    (Hand([Card(0,4), Card(6,3), Card(1,3), Card(12,1)]), Card(9,1), 1), #This hand has eyes, but nothing else; expect 1.
+])
+
+def test_points_with_cut(point_hand: Hand, cut: Card, points: int):
+    assert point_hand.points(cut) == points
+
+#Verify that adding cut card does not change hand outside of call.
+@pytest.mark.parametrize("point_hand, cut, points", [
+    (Hand([Card(0,1), Card(5,1), Card(12,3), Card(12,1)]), Card(4,1), 11), #4 flush points, eyes, 2 pair points, 4 fifteen points; expect 11.
+    (Hand([Card(5,4), Card(6,1), Card(7,3), Card(7,1)]), Card(6,3), 24), #12 run points, 4 pair points, 8 fifteen points; expect 24.
+    (Hand([Card(4,4), Card(4,3), Card(4,0), Card(4,1)]), Card(4,2), 43), #Forms a ring, 20 pair points, 20 fifteen points; expect 43.
+    (Hand([Card(0,4), Card(6,3), Card(1,3), Card(12,1)]), Card(9,1), 1), #This hand has eyes, but nothing else; expect 1.
+])
+   
+def test_points_hand_unchanged(point_hand: Hand, cut: Card, points: int):
+    test_hand = point_hand
+    test_hand.points(cut) #This call should not change the actual contents of test_hand.
+    assert test_hand == point_hand
