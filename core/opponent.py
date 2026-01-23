@@ -36,4 +36,4 @@ class Opponent(Player):
 
         #Else, hand is of size 6 and we must throw away two cards.
         else:
-            return np.ones(shape=(6,6))/15
+            return np.triu(np.ones(shape=(6,6)),k=1)/15
